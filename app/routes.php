@@ -64,3 +64,15 @@ $router->get('/check-auth', [AuthController::class, 'checkAuth']);
 // 404 Handler
 // ============================================
 // Default 404 handling is in Router::dispatch()
+
+// ============================================
+// Dashboard Routes
+// ============================================
+$router->get('/dashboard', [DashboardController::class, 'index']);
+$router->get('/dashboard/{period}', [DashboardController::class, 'index']);
+$router->get('/dashboard/data', [DashboardController::class, 'getData']);
+$router->get('/dashboard/chart-data', [DashboardController::class, 'getChartData']);
+$router->get('/dashboard/activities', [DashboardController::class, 'getActivities']);
+$router->post('/dashboard/update-period', [DashboardController::class, 'updatePeriod']);
+$router->post('/dashboard/toggle-dark-mode', [DashboardController::class, 'toggleDarkMode']);
+$router->get('/dashboard/export/{format}', [DashboardController::class, 'export']);
