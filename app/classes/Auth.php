@@ -1,9 +1,9 @@
 <?php
 /**
- * Authentication Class
+ * Authentication Class - Updated
  * 
- * Handles user authentication, authorization, and session management.
- * Provides secure login, logout, and role-based access control.
+ * Enhanced with better security features, session binding,
+ * and activity logging.
  * 
  * @package Vicoba
  * @author VICOBA Team
@@ -24,9 +24,19 @@ class Auth
     private Session $session;
 
     /**
-     * @var User|null Authenticated user
+     * @var User|null Authenticated user data
      */
-    private ?User $user = null;
+    private ?array $user = null;
+
+    /**
+     * @var int Maximum login attempts
+     */
+    private int $maxAttempts = 5;
+
+    /**
+     * @var int Lockout time in seconds
+     */
+    private int $lockoutTime = 900; // 15 minutes
 
     /**
      * Constructor
@@ -35,6 +45,8 @@ class Auth
     {
         $this->session = new Session();
         $this->loadUserFromSession();
+        $this->checkRememberMe();
+        $this->checkSessionTimeout();
     }
 
     /**
@@ -47,23 +59,37 @@ class Auth
      */
     public function login(string $username, string $password, bool $remember = false): bool
     {
+        // Check if account is locked
+        if ($this->isLocked($username)) {
+            $this->session->flash('error', 'Account temporarily locked. Please try again later.');
+            return false;
+        }
+        
         $userModel = new User();
         
         // Find user by username or email
         $user = $userModel->findByUsernameOrEmail($username);
         
         if (!$user || !$this->verifyPassword($password, $user['password_hash'])) {
+            $this->recordFailedAttempt($username);
             return false;
         }
         
         // Check if user is active
         if ($user['status'] !== 'Active') {
+            $this->recordFailedAttempt($username);
             return false;
         }
         
-        // Update user
+        // Clear failed attempts
+        $this->clearFailedAttempts($username);
+        
+        // Store user data
         $this->user = $user;
         $this->authenticateSession($user, $remember);
+        
+        // Update last login
+        $userModel->updateLastLogin($user['id']);
         
         // Log activity
         ActivityLogger::log('LOGIN', 'users', $user['id'], 'User logged in');
@@ -84,7 +110,7 @@ class Auth
     }
 
     /**
-     * Authenticate user session
+     * Authenticate user session with security features
      * 
      * @param array $user User data
      * @param bool $remember Remember me
@@ -92,7 +118,7 @@ class Auth
      */
     private function authenticateSession(array $user, bool $remember): void
     {
-        // Regenerate session ID
+        // Regenerate session ID to prevent fixation
         $this->session->regenerate();
         
         // Store user data in session
@@ -102,6 +128,7 @@ class Auth
         $this->session->set('full_name', $user['full_name']);
         $this->session->set('authenticated', true);
         $this->session->set('login_time', time());
+        $this->session->set('last_activity', time());
         
         // Bind session to client
         $this->session->bindToClient();
@@ -110,36 +137,32 @@ class Auth
         if ($remember) {
             $this->setRememberMe($user['id']);
         }
-        
-        // Update last login
-        $userModel = new User();
-        $userModel->updateLastLogin($user['id']);
     }
 
     /**
      * Set remember me cookie
      * 
-     * @param int $userId
+     * @param int $userId User ID
      * @return void
      */
     private function setRememberMe(int $userId): void
     {
-        $token = Security::generateRandomString(64);
+        $token = Security::generateToken(64);
         $expires = time() + (86400 * 30); // 30 days
         
         // Store token in database
         $userModel = new User();
         $userModel->updateRememberToken($userId, $token);
         
-        // Set cookie
+        // Set secure cookie
         setcookie(
             'remember_me',
             json_encode(['user_id' => $userId, 'token' => $token]),
             $expires,
             '/',
             '',
-            true,
-            true
+            true, // Secure flag
+            true  // HttpOnly flag
         );
     }
 
@@ -148,7 +171,7 @@ class Auth
      * 
      * @return void
      */
-    public function checkRememberMe(): void
+    private function checkRememberMe(): void
     {
         if ($this->isAuthenticated()) {
             return;
@@ -169,6 +192,21 @@ class Auth
         $user = $userModel->findById($data['user_id']);
         
         if ($user && $user['remember_token'] === $data['token']) {
+            // Regenerate token for security
+            $newToken = Security::generateToken(64);
+            $userModel->updateRememberToken($user['id'], $newToken);
+            
+            // Update cookie with new token
+            setcookie(
+                'remember_me',
+                json_encode(['user_id' => $user['id'], 'token' => $newToken]),
+                time() + (86400 * 30),
+                '/',
+                '',
+                true,
+                true
+            );
+            
             $this->authenticateSession($user, true);
         }
     }
@@ -180,8 +218,12 @@ class Auth
      */
     public function logout(): void
     {
-        // Log activity
+        // Clear remember token
         if ($this->isAuthenticated()) {
+            $userModel = new User();
+            $userModel->clearRememberToken($this->id());
+            
+            // Log activity
             ActivityLogger::log('LOGOUT', 'users', $this->id(), 'User logged out');
         }
         
@@ -189,7 +231,7 @@ class Auth
         $this->session->destroy();
         
         // Clear remember me cookie
-        setcookie('remember_me', '', time() - 3600, '/');
+        setcookie('remember_me', '', time() - 3600, '/', '', true, true);
         
         $this->user = null;
     }
@@ -203,7 +245,30 @@ class Auth
     {
         return $this->session->get('authenticated', false) === true &&
                !$this->session->isExpired() &&
-               $this->session->validateBinding();
+               $this->session->validateBinding() &&
+               $this->id() !== null;
+    }
+
+    /**
+     * Check session timeout
+     * 
+     * @return void
+     */
+    private function checkSessionTimeout(): void
+    {
+        if (!$this->isAuthenticated()) {
+            return;
+        }
+        
+        $lastActivity = $this->session->get('last_activity', time());
+        $timeout = defined('SESSION_LIFETIME') ? SESSION_LIFETIME : 3600;
+        
+        if ((time() - $lastActivity) > $timeout) {
+            $this->logout();
+            $this->session->flash('error', 'Your session has expired. Please login again.');
+        } else {
+            $this->session->set('last_activity', time());
+        }
     }
 
     /**
@@ -237,12 +302,25 @@ class Auth
             return null;
         }
         
-        if ($this->user === null) {
+        if ($this->user === null && $this->id()) {
             $userModel = new User();
             $this->user = $userModel->findById($this->id());
         }
         
         return $this->user;
+    }
+
+    /**
+     * Load user from session
+     * 
+     * @return void
+     */
+    private function loadUserFromSession(): void
+    {
+        if ($this->isAuthenticated() && $this->id()) {
+            $userModel = new User();
+            $this->user = $userModel->findById($this->id());
+        }
     }
 
     /**
@@ -264,6 +342,90 @@ class Auth
         }
         
         return $userRole === $roles;
+    }
+
+    /**
+     * Check if user has permission (alias for hasRole)
+     * 
+     * @param string|array $permissions Permission(s) to check
+     * @return bool
+     */
+    public function hasPermission($permissions): bool
+    {
+        return $this->hasRole($permissions);
+    }
+
+    /**
+     * Record failed login attempt
+     * 
+     * @param string $username Username attempted
+     * @return void
+     */
+    private function recordFailedAttempt(string $username): void
+    {
+        $key = 'login_attempts_' . $username;
+        $attempts = $this->session->get($key, []);
+        $attempts[] = time();
+        $this->session->set($key, $attempts);
+        
+        // Log failed attempt
+        ActivityLogger::log(
+            'LOGIN_FAILED',
+            'users',
+            null,
+            'Failed login attempt for: ' . $username
+        );
+    }
+
+    /**
+     * Check if account is locked
+     * 
+     * @param string $username Username to check
+     * @return bool
+     */
+    private function isLocked(string $username): bool
+    {
+        $key = 'login_attempts_' . $username;
+        $attempts = $this->session->get($key, []);
+        
+        if (count($attempts) < $this->maxAttempts) {
+            return false;
+        }
+        
+        // Check if attempts are within lockout window
+        $recentAttempts = array_filter($attempts, function($timestamp) {
+            return (time() - $timestamp) < $this->lockoutTime;
+        });
+        
+        if (count($recentAttempts) < $this->maxAttempts) {
+            // Reset attempts if not enough within window
+            $this->clearFailedAttempts($username);
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Clear failed login attempts
+     * 
+     * @param string $username Username
+     * @return void
+     */
+    private function clearFailedAttempts(string $username): void
+    {
+        $key = 'login_attempts_' . $username;
+        $this->session->remove($key);
+    }
+
+    /**
+     * Get session instance
+     * 
+     * @return Session
+     */
+    public function getSession(): Session
+    {
+        return $this->session;
     }
 
     /**
@@ -305,28 +467,4 @@ class Auth
     {
         return $this->hasRole('Member');
     }
-
-    /**
-     * Get session instance
-     * 
-     * @return Session
-     */
-    public function getSession(): Session
-    {
-        return $this->session;
-    }
-
-    /**
-     * Load user from session
-     * 
-     * @return void
-     */
-    private function loadUserFromSession(): void
-    {
-        if ($this->isAuthenticated() && $this->id()) {
-            $userModel = new User();
-            $this->user = $userModel->findById($this->id());
-        }
-    }
 }
-?>
