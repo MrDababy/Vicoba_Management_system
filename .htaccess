@@ -1,0 +1,24 @@
+# Deny access to all files except public directory
+<Files .env>
+    Order allow,deny
+    Deny from all
+</Files>
+
+Options -Indexes
+
+# Hide sensitive directories
+RedirectMatch 403 ^/app/.*$
+RedirectMatch 403 ^/config/.*$
+RedirectMatch 403 ^/database/.*$
+RedirectMatch 403 ^/logs/.*$
+RedirectMatch 403 ^/tests/.*$
+RedirectMatch 403 ^/vendor/.*$
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
