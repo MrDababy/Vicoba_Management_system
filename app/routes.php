@@ -106,3 +106,16 @@ $router->get('/savings/receipt/{id}', [SavingsController::class, 'receipt']);
 $router->get('/savings/export/{format}', [SavingsController::class, 'export']);
 $router->get('/savings/balance', [SavingsController::class, 'getBalance']);
 $router->get('/savings/monthly-summary', [SavingsController::class, 'getMonthlySummary']);
+
+// ============================================
+// Loan Routes
+// ============================================
+$router->get('/loans', [LoanController::class, 'index']);
+$router->get('/loans/create', [LoanController::class, 'create']);
+$router->post('/loans', [LoanController::class, 'store']);
+$router->get('/loans/{id}', [LoanController::class, 'view']);
+$router->get('/loans/{id}/approve', [LoanController::class, 'approve']);
+$router->post('/loans/{id}/approve', [LoanController::class, 'processApprove']);
+$router->post('/loans/{id}/reject', [LoanController::class, 'reject']);
+$router->get('/loans/{id}/installments', [LoanController::class, 'installments']);
+$router->get('/loans/export/{format}', [LoanController::class, 'export']);
