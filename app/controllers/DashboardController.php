@@ -87,6 +87,11 @@ class DashboardController extends BaseController
         $savingsModel = new Savings();
         $stats['monthly_savings'] = $savingsModel->getMonthlySavingsData();
         $stats['recent_savings'] = $savingsModel->getRecentSavings(5);
+
+        // Add to DashboardController's index method
+        $fineModel = new \App\Models\Fine();
+        $stats['outstanding_fines'] = $fineModel->getStats()['outstanding_amount'];
+        $stats['recent_fines'] = $fineModel->getRecentFines(5);
         
         $this->render('dashboard.index', $data, 'main');
     }

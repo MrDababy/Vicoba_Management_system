@@ -119,3 +119,28 @@ $router->post('/loans/{id}/approve', [LoanController::class, 'processApprove']);
 $router->post('/loans/{id}/reject', [LoanController::class, 'reject']);
 $router->get('/loans/{id}/installments', [LoanController::class, 'installments']);
 $router->get('/loans/export/{format}', [LoanController::class, 'export']);
+
+
+// ============================================
+// Fine Routes
+// ============================================
+$router->get('/fines', [FineController::class, 'index']);
+$router->get('/fines/create', [FineController::class, 'create']);
+$router->post('/fines', [FineController::class, 'store']);
+$router->get('/fines/{id}', [FineController::class, 'view']);
+$router->get('/fines/{id}/edit', [FineController::class, 'edit']);
+$router->put('/fines/{id}', [FineController::class, 'update']);
+$router->delete('/fines/{id}', [FineController::class, 'delete']);
+$router->post('/fines/{id}/pay', [FineController::class, 'pay']);
+$router->post('/fines/{id}/waive', [FineController::class, 'waive']);
+
+// Fine Type Routes
+$router->get('/fines/types', [FineController::class, 'types']);
+$router->get('/fines/types/create', [FineController::class, 'typeCreate']);
+$router->post('/fines/types', [FineController::class, 'typeStore']);
+$router->get('/fines/types/{id}/edit', [FineController::class, 'typeEdit']);
+$router->put('/fines/types/{id}', [FineController::class, 'typeUpdate']);
+$router->delete('/fines/types/{id}', [FineController::class, 'typeDelete']);
+
+// Export
+$router->get('/fines/export/{format}', [FineController::class, 'export']);
