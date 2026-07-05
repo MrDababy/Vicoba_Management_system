@@ -82,6 +82,11 @@ class DashboardController extends BaseController
             null,
             'User viewed dashboard with period: ' . $period
         );
+
+        // Add to DashboardController's index method
+        $savingsModel = new Savings();
+        $stats['monthly_savings'] = $savingsModel->getMonthlySavingsData();
+        $stats['recent_savings'] = $savingsModel->getRecentSavings(5);
         
         $this->render('dashboard.index', $data, 'main');
     }

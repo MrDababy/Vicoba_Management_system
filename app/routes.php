@@ -90,3 +90,19 @@ $router->put('/members/{id}', [MemberController::class, 'update']);
 $router->delete('/members/{id}', [MemberController::class, 'delete']);
 $router->post('/members/{id}/deactivate', [MemberController::class, 'deactivate']);
 $router->get('/members/export', [MemberController::class, 'export']);
+
+
+// ============================================
+// Savings Routes
+// ============================================
+$router->get('/savings', [SavingsController::class, 'index']);
+$router->get('/savings/create', [SavingsController::class, 'create']);
+$router->post('/savings', [SavingsController::class, 'store']);
+$router->get('/savings/{id}', [SavingsController::class, 'view']);
+$router->get('/savings/{id}/edit', [SavingsController::class, 'edit']);
+$router->put('/savings/{id}', [SavingsController::class, 'update']);
+$router->delete('/savings/{id}', [SavingsController::class, 'delete']);
+$router->get('/savings/receipt/{id}', [SavingsController::class, 'receipt']);
+$router->get('/savings/export/{format}', [SavingsController::class, 'export']);
+$router->get('/savings/balance', [SavingsController::class, 'getBalance']);
+$router->get('/savings/monthly-summary', [SavingsController::class, 'getMonthlySummary']);
