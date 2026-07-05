@@ -92,6 +92,10 @@ class DashboardController extends BaseController
         $fineModel = new \App\Models\Fine();
         $stats['outstanding_fines'] = $fineModel->getStats()['outstanding_amount'];
         $stats['recent_fines'] = $fineModel->getRecentFines(5);
+
+        // Add to DashboardController's index method
+        $dividendModel = new \App\Models\Dividend();
+        $stats['dividends_distributed'] = $dividendModel->getStats(date('Y'))['paid_amount'];
         
         $this->render('dashboard.index', $data, 'main');
     }

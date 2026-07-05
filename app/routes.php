@@ -144,3 +144,13 @@ $router->delete('/fines/types/{id}', [FineController::class, 'typeDelete']);
 
 // Export
 $router->get('/fines/export/{format}', [FineController::class, 'export']);
+
+// ============================================
+// Dividend Routes
+// ============================================
+$router->get('/dividends', [DividendController::class, 'index']);
+$router->get('/dividends/calculate', [DividendController::class, 'calculate']);
+$router->post('/dividends/process-calculate', [DividendController::class, 'processCalculate']);
+$router->get('/dividends/{id}', [DividendController::class, 'view']);
+$router->post('/dividends/{id}/pay', [DividendController::class, 'pay']);
+$router->get('/dividends/report/{format}', [DividendController::class, 'report']);
