@@ -154,3 +154,25 @@ $router->post('/dividends/process-calculate', [DividendController::class, 'proce
 $router->get('/dividends/{id}', [DividendController::class, 'view']);
 $router->post('/dividends/{id}/pay', [DividendController::class, 'pay']);
 $router->get('/dividends/report/{format}', [DividendController::class, 'report']);
+
+
+// ============================================
+// Report Routes
+// ============================================
+$router->get('/reports', [ReportController::class, 'index']);
+$router->get('/reports/members', [ReportController::class, 'members']);
+$router->get('/reports/members/{format}', [ReportController::class, 'members']);
+$router->get('/reports/savings', [ReportController::class, 'savings']);
+$router->get('/reports/savings/{format}', [ReportController::class, 'savings']);
+$router->get('/reports/loans', [ReportController::class, 'loans']);
+$router->get('/reports/loans/{format}', [ReportController::class, 'loans']);
+$router->get('/reports/repayments', [ReportController::class, 'repayments']);
+$router->get('/reports/repayments/{format}', [ReportController::class, 'repayments']);
+$router->get('/reports/fines', [ReportController::class, 'fines']);
+$router->get('/reports/fines/{format}', [ReportController::class, 'fines']);
+$router->get('/reports/dividends', [ReportController::class, 'dividends']);
+$router->get('/reports/dividends/{format}', [ReportController::class, 'dividends']);
+$router->get('/reports/financial', [ReportController::class, 'financial']);
+$router->get('/reports/financial/{format}', [ReportController::class, 'financial']);
+$router->get('/reports/cashflow', [ReportController::class, 'cashflow']);
+$router->get('/reports/cashflow/{format}', [ReportController::class, 'cashflow']);
