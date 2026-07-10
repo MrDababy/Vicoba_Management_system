@@ -1,6 +1,6 @@
 <h4 class="text-center mb-4">Welcome Back</h4>
 
-<form action="/login" method="POST" id="loginForm">
+<form action="<?= BASE_URL ?>/login" method="POST">
     <!-- CSRF Token -->
     <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
     
@@ -36,7 +36,7 @@
             <input type="checkbox" class="form-check-input" id="remember" name="remember" value="1">
             <label class="form-check-label" for="remember">Remember Me</label>
         </div>
-        <a href="/forgot-password" class="auth-link small">Forgot Password?</a>
+        <a href="<?= BASE_URL ?>/forgot-password" class="auth-link small">Forgot Password?</a>
     </div>
     
     <!-- Submit Button -->
@@ -46,7 +46,7 @@
     
     <!-- Register Link -->
     <div class="text-center mt-4">
-        <p class="mb-0">Don't have an account? <a href="/register" class="auth-link">Register Here</a></p>
+        <p class="mb-0">Don't have an account? <a href="<?= BASE_URL ?>/register" class="auth-link">Register Here</a></p>
     </div>
 </form>
 

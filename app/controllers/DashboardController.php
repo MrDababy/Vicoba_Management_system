@@ -60,6 +60,7 @@ class DashboardController extends BaseController
         // Prepare data for view
         $data = [
             'title' => 'Dashboard - ' . APP_NAME,
+            'dashboardModel' => $this->dashboardModel,
             'stats' => $stats,
             'financial_summary' => $financialSummary,
             'top_savers' => $topSavers,

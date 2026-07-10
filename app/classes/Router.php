@@ -188,7 +188,7 @@ class Router
      */
     public function dispatch()
     {
-        e
+       
         
         $route = $this->findRoute();
 

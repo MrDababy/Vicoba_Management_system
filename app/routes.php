@@ -29,7 +29,7 @@ if (!$router) {
 // Authentication Routes
 // ============================================
 $router->get('/', function () {
-    header('Location: ' . BASE_URL . '/login');
+    header('Location: ' .BASE_URL . '/login');
     exit;
 });
 $router->get('/login', [AuthController::class, 'showLogin']);

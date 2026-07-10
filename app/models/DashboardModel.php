@@ -187,22 +187,26 @@ class DashboardModel
      * 
      * @return float
      */
-    private function getOutstandingFines(): float
-    {
-        $sql = "SELECT SUM(f.amount - COALESCE(SUM(fp.amount_paid), 0)) as total 
-                FROM fines f 
-                LEFT JOIN fine_payments fp ON f.id = fp.fine_id 
-                WHERE f.status IN ('Pending', 'Partially_Paid')
-                GROUP BY f.id";
-        $stmt = $this->db->query($sql);
-        $results = $stmt->fetchAll();
-        
-        $total = 0;
-        foreach ($results as $row) {
-            $total += (float)($row['total'] ?? 0);
-        }
-        return $total;
-    }
+private function getOutstandingFines(): float
+{
+    $sql = "
+        SELECT SUM(balance) AS total
+        FROM (
+            SELECT
+                (f.amount - COALESCE(SUM(fp.amount_paid), 0)) AS balance
+            FROM fines f
+            LEFT JOIN fine_payments fp
+                ON f.id = fp.fine_id
+            WHERE f.status IN ('Pending', 'Partially_Paid')
+            GROUP BY f.id, f.amount
+        ) AS balances
+    ";
+
+    $stmt = $this->db->query($sql);
+    $result = $stmt->fetch();
+
+    return (float)($result['total'] ?? 0);
+}
 
     /**
      * Get annual profit
@@ -507,7 +511,7 @@ class DashboardModel
                     (SELECT SUM(amount) FROM loans WHERE status IN ('Approved', 'Active', 'Completed')) as total_loans_disbursed,
                     (SELECT SUM(amount) FROM repayments) as total_repayments,
                     (SELECT SUM(interest_earned) FROM dividends WHERE status = 'Paid') as total_dividends_paid,
-                    (SELECT SUM(amount) FROM fines WHERE status IN ('Pending', 'Partially_Paid')) as outstanding_fines_total";
+                    (SELECT SUM(balance) AS outstanding_fines_total FROM ( SELECT (f.amount - COALESCE(SUM(fp.amount_paid),0)) AS balance FROM fines f LEFT JOIN fine_payments fp ON f.id = fp.fine_id WHERE f.status IN ('Pending', 'Partially_Paid') GROUP BY f.id, f.amount) AS balances) as outstanding_fines_total";
         
         $stmt = $this->db->query($sql);
         $result = $stmt->fetch();

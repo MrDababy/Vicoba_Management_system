@@ -197,6 +197,11 @@ abstract class BaseController
      */
     protected function redirect(string $url): void
     {
+        // If it's not already an absolute URL, prepend BASE_URL
+        if (!preg_match('#^https?://#', $url)) {
+        $url = BASE_URL . '/' . ltrim($url, '/');
+        }
+        
         header('Location: ' . $url);
         exit;
     }
