@@ -10,7 +10,7 @@
  */
 ?>
 
-<form action="<?php echo $is_edit ? '/members/' . $member['id'] : '/members'; ?>" 
+<form action="<?php echo $is_edit ? BASE_URL . '/members/' . $member['id'] : BASE_URL . '/members'; ?>" 
       method="POST" enctype="multipart/form-data" id="memberForm">
     
     <!-- CSRF Token -->
@@ -140,7 +140,7 @@
                     <i class="fas fa-save me-1"></i> 
                     <?php echo $is_edit ? 'Update Member' : 'Register Member'; ?>
                 </button>
-                <a href="/members" class="btn btn-secondary">Cancel</a>
+                <a href="<?= BASE_URL ?>/members" class="btn btn-secondary">Cancel</a>
             </div>
         </div>
     </div>

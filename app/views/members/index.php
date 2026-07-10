@@ -13,11 +13,11 @@
     </div>
     
     <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/members/export'">
+        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='<?= BASE_URL ?>/members/export'">
             <i class="fas fa-file-export me-1"></i> Export
         </button>
         <?php if ($auth->hasRole(['Admin', 'Treasurer', 'Secretary'])): ?>
-        <a href="/members/create" class="btn btn-primary btn-sm">
+        <a href="<?= BASE_URL ?>/members/create" class="btn btn-primary btn-sm">
             <i class="fas fa-user-plus me-1"></i> Add Member
         </a>
         <?php endif; ?>
@@ -90,7 +90,7 @@
 <!-- Search and Filters -->
 <div class="card dashboard-card mb-4">
     <div class="card-body">
-        <form method="GET" action="/members" id="searchForm" class="row g-3">
+        <form method="GET" action="<?= BASE_URL ?>/members" id="searchForm" class="row g-3">
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
@@ -387,4 +387,4 @@ document.querySelector('input[name="search"]')?.addEventListener('keypress', fun
 [data-bs-theme="dark"] .stat-icon.warning {
     background: rgba(237, 137, 54, 0.2);
 }
-</style>
+</style>                            <a class="dropdown-item" href="<?= BASE_URL ?>/profile"></a>

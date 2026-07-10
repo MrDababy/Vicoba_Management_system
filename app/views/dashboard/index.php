@@ -307,7 +307,7 @@
         <div class="card dashboard-card">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0">Top Savers</h6>
-                <a href="/members" class="text-decoration-none small">View All</a>
+                <a href="<?php echo BASE_URL; ?>/members" class="text-decoration-none small">View All</a>
             </div>
             <div class="card-body p-0">
                 <?php if (!empty($top_savers)): ?>

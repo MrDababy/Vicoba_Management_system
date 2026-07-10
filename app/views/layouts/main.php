@@ -308,47 +308,47 @@
                 <a href="/dashboard" class="active">
                     <i class="fas fa-chart-pie"></i> Dashboard
                 </a>
-                <a href="/members">
+                <a href="<?= BASE_URL ?>/members">
                     <i class="fas fa-users"></i> Members
                 </a>
-                <a href="/savings">
+                <a href="<?= BASE_URL ?>/savings">
                     <i class="fas fa-piggy-bank"></i> Savings
                 </a>
-                <a href="/loans">
+                <a href="<?= BASE_URL ?>/loans">
                     <i class="fas fa-hand-holding-usd"></i> Loans
                 </a>
-                <a href="/repayments">
+                <a href="<?= BASE_URL ?>/repayments">
                     <i class="fas fa-credit-card"></i> Repayments
                 </a>
-                <a href="/fines">
+                <a href="<?= BASE_URL ?>/fines">
                     <i class="fas fa-exclamation-triangle"></i> Fines
                 </a>
-                <a href="/dividends">
+                <a href="<?= BASE_URL ?>/dividends">
                     <i class="fas fa-chart-line"></i> Dividends
                 </a>
-                <a href="/attendance">
+                <a href="<?= BASE_URL ?>/attendance">
                     <i class="fas fa-calendar-check"></i> Attendance
                 </a>
                 
                 <?php if ($auth->hasRole(['Admin', 'Treasurer'])): ?>
                 <div class="menu-label mt-3">Reports</div>
-                <a href="/reports">
+                <a href="<?= BASE_URL ?>/reports">
                     <i class="fas fa-file-alt"></i> Reports
                 </a>
-                <a href="/reports/financial">
+                <a href="<?= BASE_URL ?>/reports/financial">
                     <i class="fas fa-file-invoice-dollar"></i> Financial Summary
                 </a>
                 <?php endif; ?>
                 
                 <?php if ($auth->isAdmin()): ?>
                 <div class="menu-label mt-3">Administration</div>
-                <a href="/admin/users">
+                <a href="<?= BASE_URL ?>/admin/users">
                     <i class="fas fa-user-cog"></i> Users
                 </a>
-                <a href="/admin/settings">
+                <a href="<?= BASE_URL ?>/admin/settings">
                     <i class="fas fa-cog"></i> Settings
                 </a>
-                <a href="/admin/audit">
+                <a href="<?= BASE_URL ?>/admin/audit">
                     <i class="fas fa-history"></i> Audit Logs
                 </a>
                 <?php endif; ?>
@@ -416,7 +416,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item text-danger" href="/logout">
+                            <a class="dropdown-item text-danger" href="<?= BASE_URL ?>/logout">
                                 <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </a>
                         </li>
