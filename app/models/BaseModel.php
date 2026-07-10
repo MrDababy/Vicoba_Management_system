@@ -163,6 +163,17 @@ abstract class BaseModel
     }
 
     /**
+     * Find a record by primary key using a convenience alias.
+     *
+     * @param int $id Record ID
+     * @return array|null
+     */
+    public function findById(int $id): ?array
+    {
+        return $this->find($id);
+    }
+
+    /**
      * Find by field value
      * 
      * @param string $field Field name

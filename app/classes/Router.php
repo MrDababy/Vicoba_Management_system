@@ -188,7 +188,10 @@ class Router
      */
     public function dispatch()
     {
+        e
+        
         $route = $this->findRoute();
+
         
         if ($route === null) {
             throw new RouteNotFoundException('Route not found: ' . $this->method . ' ' . $this->uri);
@@ -281,21 +284,47 @@ class Router
      * @return mixed
      * @throws RouteNotFoundException
      */
-    private function callController(string $handler, array $params)
+    private function callController($handler, array $params)
     {
-        [$controllerClass, $method] = explode('@', $handler);
-        
-        if (!class_exists($controllerClass)) {
-            throw new RouteNotFoundException("Controller '$controllerClass' not found");
+        if (is_array($handler) && count($handler) === 2) {
+            [$controllerOrClass, $method] = $handler;
+
+            if (is_object($controllerOrClass)) {
+                $controller = $controllerOrClass;
+                $controllerClass = get_class($controller);
+            } else {
+                $controllerClass = $controllerOrClass;
+                if (!class_exists($controllerClass)) {
+                    throw new RouteNotFoundException("Controller '$controllerClass' not found");
+                }
+
+                $controller = new $controllerClass();
+            }
+
+            if (!method_exists($controller, $method)) {
+                throw new RouteNotFoundException("Method '$method' not found in '$controllerClass'");
+            }
+
+            return $controller->$method(...$params);
         }
-        
-        $controller = new $controllerClass();
-        
-        if (!method_exists($controller, $method)) {
-            throw new RouteNotFoundException("Method '$method' not found in '$controllerClass'");
+
+        if (is_string($handler) && str_contains($handler, '@')) {
+            [$controllerClass, $method] = explode('@', $handler, 2);
+
+            if (!class_exists($controllerClass)) {
+                throw new RouteNotFoundException("Controller '$controllerClass' not found");
+            }
+
+            $controller = new $controllerClass();
+
+            if (!method_exists($controller, $method)) {
+                throw new RouteNotFoundException("Method '$method' not found in '$controllerClass'");
+            }
+
+            return $controller->$method(...$params);
         }
-        
-        return $controller->$method(...$params);
+
+        throw new RouteNotFoundException('Invalid controller handler');
     }
 
     /**

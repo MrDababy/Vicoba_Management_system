@@ -2,7 +2,7 @@
 RewriteEngine On
 
 # Set base path (adjust if needed)
-RewriteBase /vicoba/
+RewriteBase /vicoba/public/
 
 # Redirect to index.php for all requests
 RewriteCond %{REQUEST_FILENAME} !-f

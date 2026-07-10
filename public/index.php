@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Front Controller
  * 
@@ -21,7 +22,7 @@ ob_start();
 define('ROOT_PATH', dirname(__DIR__));
 define('APP_PATH', ROOT_PATH . '/app');
 define('PUBLIC_PATH', ROOT_PATH . '/public');
-
+define('VIEWS_PATH', APP_PATH . '/views');
 // Load configuration
 require_once ROOT_PATH . '/config/config.php';
 require_once ROOT_PATH . '/config/database.php';
@@ -48,13 +49,15 @@ if (file_exists(ROOT_PATH . '/.env')) {
 
 // Autoloader
 spl_autoload_register(function ($class) {
-    // Remove namespace prefix
-    $class = str_replace('App\\', '', $class);
-    
-    // Convert namespace separators to directory separators
+    $class = ltrim($class, '\\');
+
+    if (strncmp($class, 'App\\', 4) === 0) {
+        $class = substr($class, 4);
+    }
+
     $classPath = str_replace('\\', '/', $class);
-    
-    // Check each directory
+    $classPathLower = strtolower($classPath);
+
     $directories = [
         APP_PATH . '/classes/',
         APP_PATH . '/controllers/',
@@ -63,12 +66,20 @@ spl_autoload_register(function ($class) {
         APP_PATH . '/middleware/',
         APP_PATH . '/exceptions/'
     ];
-    
+
     foreach ($directories as $directory) {
-        $file = $directory . $classPath . '.php';
-        if (file_exists($file)) {
-            require_once $file;
-            return;
+        $candidates = [
+            $directory . $classPath . '.php',
+            $directory . $classPathLower . '.php',
+            $directory . basename($classPath) . '.php',
+            $directory . strtolower(basename($classPath)) . '.php'
+        ];
+
+        foreach ($candidates as $file) {
+            if (file_exists($file)) {
+                require_once $file;
+                return;
+            }
         }
     }
 });
@@ -80,6 +91,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Initialize router
 $router = new App\Classes\Router();
+$GLOBALS['router'] = $router;
 
 // Load routes
 require_once APP_PATH . '/routes.php';

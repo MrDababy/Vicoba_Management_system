@@ -1,9 +1,9 @@
 <?php
 /**
- * Encryption Helper Class
+ * Encryption Helper
  * 
- * Provides AES-256-CBC encryption and decryption for sensitive data.
- * Implements secure key management and IV handling.
+ * Provides AES-256-CBC encryption and decryption for sensitive data
+ * with secure key management.
  * 
  * @package Vicoba
  * @author VICOBA Team
@@ -14,12 +14,12 @@ namespace App\Helpers;
 
 use App\Exceptions\SecurityException;
 
-class Encryption
+class EncryptionHelper
 {
     /**
      * @var string Encryption algorithm
      */
-    private string $cipher = 'aes-256-cbc';
+    private string $cipher = 'AES-256-CBC';
 
     /**
      * @var string Encryption key
@@ -34,7 +34,7 @@ class Encryption
     /**
      * @var int Options for openssl
      */
-    private int $options = 0;
+    private int $options = OPENSSL_RAW_DATA;
 
     /**
      * Constructor
@@ -43,42 +43,76 @@ class Encryption
      */
     public function __construct()
     {
-        // Load encryption key from configuration
+        // Load encryption key from environment
         $this->key = $this->getKey();
-
+        
+        // Validate key
         if (empty($this->key)) {
-            $this->key = 'default-dev-key-please-change';
+            throw new SecurityException('Encryption key is not configured');
         }
-
+        
         // Validate cipher
-        $cipher = strtolower($this->cipher);
-        if (!in_array($cipher, openssl_get_cipher_methods())) {
+        if (!in_array($this->cipher, openssl_get_cipher_methods())) {
             throw new SecurityException('Unsupported encryption cipher');
         }
-
-        $this->cipher = $cipher;
+        
+        // Set IV length
+        $this->ivLength = openssl_cipher_iv_length($this->cipher);
     }
 
     /**
-     * Get encryption key
+     * Get encryption key from environment
      * 
      * @return string
+     * @throws SecurityException
      */
     private function getKey(): string
     {
-        // Use constant if defined
-        if (defined('ENCRYPTION_KEY')) {
-            return base64_decode(ENCRYPTION_KEY);
-        }
-        
-        // Fallback to environment variable
+        // Check environment variable
         $key = getenv('ENCRYPTION_KEY');
         
         if ($key) {
             return base64_decode($key);
         }
         
-        return '';
+        // Check constant
+        if (defined('ENCRYPTION_KEY')) {
+            return base64_decode(ENCRYPTION_KEY);
+        }
+        
+        // In development, generate a key
+        if (APP_ENV === 'development') {
+            $key = base64_encode(random_bytes(32));
+            // Store in .env file for future use
+            $this->saveKeyToEnv($key);
+            return base64_decode($key);
+        }
+        
+        throw new SecurityException('Encryption key not found in environment');
+    }
+
+    /**
+     * Save encryption key to .env file (development only)
+     * 
+     * @param string $key Base64 encoded key
+     * @return void
+     */
+    private function saveKeyToEnv(string $key): void
+    {
+        if (APP_ENV !== 'development') {
+            return;
+        }
+        
+        $envFile = ROOT_PATH . '/.env';
+        if (!file_exists($envFile)) {
+            return;
+        }
+        
+        $content = file_get_contents($envFile);
+        if (strpos($content, 'ENCRYPTION_KEY') === false) {
+            $content .= PHP_EOL . 'ENCRYPTION_KEY=' . $key . PHP_EOL;
+            file_put_contents($envFile, $content);
+        }
     }
 
     /**
@@ -135,7 +169,7 @@ class Encryption
         
         try {
             // Decode base64
-            $decoded = base64_decode($data);
+            $decoded = base64_decode($data, true);
             
             if ($decoded === false) {
                 throw new SecurityException('Invalid encrypted data format');
@@ -204,7 +238,7 @@ class Encryption
     }
 
     /**
-     * Get encryption cipher information
+     * Get encryption information
      * 
      * @return array
      */
@@ -250,5 +284,84 @@ class Encryption
             throw new SecurityException('Re-encryption failed: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Rotate encryption key
+     * 
+     * @param string $newKey New encryption key (base64 encoded)
+     * @return bool
+     * @throws SecurityException
+     */
+    public function rotateKey(string $newKey): bool
+    {
+        $newKeyDecoded = base64_decode($newKey);
+        
+        if (strlen($newKeyDecoded) !== 32) {
+            throw new SecurityException('Invalid key length. Must be 32 bytes.');
+        }
+        
+        // Get all tables with encrypted fields
+        $tables = [
+            'members' => ['national_id', 'phone', 'email', 'address', 'full_name'],
+            'users' => ['phone', 'email'],
+            'loans' => ['remarks'],
+            'fines' => ['description', 'waiver_reason']
+        ];
+        
+        $this->beginTransaction();
+        
+        try {
+            foreach ($tables as $table => $fields) {
+                foreach ($fields as $field) {
+                    // Get all records with non-empty field
+                    $sql = "SELECT id, {$field} FROM {$table} WHERE {$field} IS NOT NULL AND {$field} != ''";
+                    $stmt = Database::getInstance()->query($sql);
+                    $records = $stmt->fetchAll();
+                    
+                    foreach ($records as $record) {
+                        // Re-encrypt with new key
+                        $reEncrypted = $this->reEncrypt($record[$field], $newKeyDecoded);
+                        
+                        // Update record
+                        $updateSql = "UPDATE {$table} SET {$field} = ? WHERE id = ?";
+                        Database::getInstance()->query($updateSql, [$reEncrypted, $record['id']]);
+                    }
+                }
+            }
+            
+            // Update key in environment
+            $this->saveKeyToEnv($newKey);
+            
+            $this->commit();
+            return true;
+            
+        } catch (\Exception $e) {
+            $this->rollback();
+            throw new SecurityException('Key rotation failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Begin transaction
+     */
+    private function beginTransaction(): void
+    {
+        Database::getInstance()->beginTransaction();
+    }
+
+    /**
+     * Commit transaction
+     */
+    private function commit(): void
+    {
+        Database::getInstance()->commit();
+    }
+
+    /**
+     * Rollback transaction
+     */
+    private function rollback(): void
+    {
+        Database::getInstance()->rollback();
+    }
 }
-?>

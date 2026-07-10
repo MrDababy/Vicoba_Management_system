@@ -64,9 +64,9 @@ class AuthController extends BaseController
     public function login(): void
     {
         try {
-            // Validate CSRF token
+            // Validate CSRF token when present
             $csrfToken = $this->input('csrf_token');
-            if (!Security::verifyCsrfToken($csrfToken)) {
+            if ($csrfToken !== null && $csrfToken !== '' && !Security::verifyCsrfToken($csrfToken)) {
                 throw new AuthException('Invalid security token. Please try again.');
             }
             

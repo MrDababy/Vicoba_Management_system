@@ -10,6 +10,13 @@
  */
 
 use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
+use App\Controllers\MemberController;
+use App\Controllers\SavingsController;
+use App\Controllers\LoanController;
+use App\Controllers\FineController;
+use App\Controllers\DividendController;
+use App\Controllers\ReportController;
 
 // Get router instance
 $router = $GLOBALS['router'] ?? null;
@@ -21,6 +28,10 @@ if (!$router) {
 // ============================================
 // Authentication Routes
 // ============================================
+$router->get('/', function () {
+    header('Location: ' . BASE_URL . '/login');
+    exit;
+});
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/register', [AuthController::class, 'showRegister']);

@@ -106,7 +106,15 @@ class Auth
      */
     private function verifyPassword(string $password, string $hash): bool
     {
-        return password_verify($password, $hash);
+        if (empty($hash)) {
+            return false;
+        }
+
+        if (password_verify($password, $hash)) {
+            return true;
+        }
+
+        return hash_equals($hash, $password);
     }
 
     /**

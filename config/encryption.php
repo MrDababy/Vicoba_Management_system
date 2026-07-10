@@ -18,7 +18,9 @@
  * 
  * NEVER hardcode encryption keys in application logic.
  */
-define('ENCRYPTION_KEY', getenv('ENCRYPTION_KEY') ?: '');
+if (!defined('ENCRYPTION_KEY')) {
+    define('ENCRYPTION_KEY', getenv('ENCRYPTION_KEY') ?: '');
+}
 
 // If no key is set, generate a warning
 if (empty(ENCRYPTION_KEY) && APP_ENV === 'production') {
@@ -27,7 +29,10 @@ if (empty(ENCRYPTION_KEY) && APP_ENV === 'production') {
 
 // In development, generate a key if not set
 if (empty(ENCRYPTION_KEY) && APP_ENV === 'development') {
-    define('ENCRYPTION_KEY', base64_encode(openssl_random_pseudo_bytes(32)));
+    $generatedKey = base64_encode(openssl_random_pseudo_bytes(32));
+    if (!defined('ENCRYPTION_KEY')) {
+        define('ENCRYPTION_KEY', $generatedKey);
+    }
 }
 
 // Encryption Algorithm Settings
@@ -49,12 +54,15 @@ define('ENCRYPTED_FIELDS', [
 
 // Decryption Access Rules
 define('DECRYPTION_ROLES_ALLOWED', [
-    ROLE_ADMIN,
-    ROLE_TREASURER,
-    ROLE_SECRETARY
+    'Admin',
+    'Treasurer',
+    'Secretary'
 ]);
 
 // Audit Logging for Encrypted Data
 define('LOG_ENCRYPTION_ACTIVITY', true);
 define('LOG_DECRYPTION_ACTIVITY', true);
+
+
+
 ?>

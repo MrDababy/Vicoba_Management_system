@@ -204,7 +204,7 @@ class ReceiptGenerator
                 window.onload = function() {
                     if (window.opener) {
                         setTimeout(function() {
-                            // Don't auto-print, let user decide
+                            // Don\'t auto-print, let user decide
                         }, 1000);
                     }
                 }

@@ -26,7 +26,7 @@ class Database
     /**
      * @var PDO PDO connection instance
      */
-    private PDO $connection;
+    private ?PDO $connection = null;
 
     /**
      * @var int Query count for debugging
@@ -196,7 +196,9 @@ class Database
      */
     public function __destruct()
     {
-        $this->connection = null;
+        if (isset($this->connection)) {
+            unset($this->connection);
+        }
     }
 
     /**

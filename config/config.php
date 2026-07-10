@@ -16,6 +16,7 @@ define('APP_VERSION', '1.0.0');
 define('APP_URL', 'http://localhost/vicoba');
 define('APP_ENV', 'development'); // development | production | testing
 
+
 // Timezone Settings
 date_default_timezone_set('Africa/Dar_es_Salaam');
 
@@ -35,7 +36,9 @@ define('PASSWORD_STRENGTH', 'medium'); // weak | medium | strong
 
 // Encryption Settings
 define('ENCRYPTION_CIPHER', 'AES-256-CBC');
-define('ENCRYPTION_KEY', ''); // Set in .env file
+if (!defined('ENCRYPTION_KEY')) {
+    define('ENCRYPTION_KEY', ''); // Set in .env file
+}
 
 // File Upload Settings
 define('MAX_FILE_SIZE', 5242880); // 5MB
