@@ -128,7 +128,7 @@
                 <button type="submit" class="btn btn-primary btn-sm">
                     <i class="fas fa-filter me-1"></i> Apply Filters
                 </button>
-                <a href="/members" class="btn btn-secondary btn-sm">
+                <a href="<?= BASE_URL ?>/members" class="btn btn-secondary btn-sm">
                     <i class="fas fa-undo me-1"></i> Reset
                 </a>
             </div>
@@ -158,7 +158,7 @@
                         <td colspan="7" class="text-center py-4">
                             <i class="fas fa-users fa-2x text-muted mb-2 d-block"></i>
                             <p class="text-muted mb-0">No members found. <?php if ($auth->hasRole(['Admin', 'Treasurer', 'Secretary'])): ?>
-                                <a href="/members/create">Add your first member</a>
+                                <a href="<?= BASE_URL ?>/members/create">Add your first member</a>
                             <?php endif; ?></p>
                         </td>
                     </tr>
@@ -215,11 +215,11 @@
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="/members/<?php echo $member['id']; ?>" class="btn btn-outline-primary" title="View">
+                                <a href="<?= BASE_URL ?>/members/<?php echo $member['id']; ?>" class="btn btn-outline-primary" title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <?php if ($auth->hasRole(['Admin', 'Treasurer', 'Secretary'])): ?>
-                                <a href="/members/<?php echo $member['id']; ?>/edit" class="btn btn-outline-warning" title="Edit">
+                                <a href="<?= BASE_URL ?>/members/<?php echo $member['id']; ?>/edit" class="btn btn-outline-warning" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <?php endif; ?>
@@ -284,7 +284,7 @@ let deleteId = null;
 function deleteMember(id, name) {
     deleteId = id;
     document.getElementById('deleteMemberName').textContent = name;
-    document.getElementById('deleteForm').action = '/members/' + id;
+    document.getElementById('deleteForm').action = '<?= BASE_URL ?>/members/' + id;
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
 
