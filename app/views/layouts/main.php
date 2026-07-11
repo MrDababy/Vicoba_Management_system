@@ -305,7 +305,7 @@
             
             <nav class="sidebar-menu">
                 <div class="menu-label">Main Menu</div>
-                <a href="/dashboard" class="active">
+                <a href="<?= BASE_URL ?>/dashboard" class="active">
                     <i class="fas fa-chart-pie"></i> Dashboard
                 </a>
                 <a href="<?= BASE_URL ?>/members">

@@ -12,15 +12,15 @@
         <p class="text-muted mb-0">Manage member fines and payments</p>
     </div>
     <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/fines/export?<?php echo http_build_query($filters); ?>'">
+        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='<?= BASE_URL ?>/fines/export?<?php echo http_build_query($filters); ?>'">
             <i class="fas fa-file-export me-1"></i> Export
         </button>
         <?php if ($auth->isAdmin()): ?>
-        <a href="/fines/types" class="btn btn-outline-secondary btn-sm">
+        <a href="<?= BASE_URL ?>/fines/types" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-cog me-1"></i> Fine Types
         </a>
         <?php endif; ?>
-        <a href="/fines/create" class="btn btn-primary btn-sm">
+        <a href="<?= BASE_URL ?>/fines/create" class="btn btn-primary btn-sm">
             <i class="fas fa-plus-circle me-1"></i> Impose Fine
         </a>
     </div>
@@ -87,7 +87,7 @@
  <!-- Filters -->
 <div class="card dashboard-card mb-4">
     <div class="card-body">
-        <form method="GET" action="/savings" id="filterForm" class="row g-3">
+        <form method="GET" action="<?= BASE_URL ?>/fines" id="filterForm" class="row g-3">
             <div class="col-md-3">
                 <select class="form-select" name="member_id">
                     <option value="">All Members</option>
@@ -151,7 +151,7 @@
                             <i class="fas fa-hand-holding-usd fa-2x text-muted mb-2 d-block"></i>
                             <p class="text-muted mb-0">No loans found.</p>
                             <?php if ($is_member || $is_admin): ?>
-                            <a href="/loans/create" class="btn btn-primary btn-sm mt-2">
+                            <a href="<?= BASE_URL ?>/loans/create" class="btn btn-primary btn-sm mt-2">
                                 <i class="fas fa-plus-circle me-1"></i> Apply for Loan
                             </a>
                             <?php endif; ?>
@@ -195,16 +195,16 @@
                         <td class="small"><?php echo date('M d, Y', strtotime($loan['application_date'])); ?></td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="/loans/<?php echo $loan['id']; ?>" class="btn btn-outline-primary" title="View">
+                                <a href="<?= BASE_URL ?>/loans/<?php echo $loan['id']; ?>" class="btn btn-outline-primary" title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <?php if ($is_admin && $loan['status'] === 'Pending'): ?>
-                                <a href="/loans/<?php echo $loan['id']; ?>/approve" class="btn btn-outline-success" title="Approve">
+                                <a href="<?= BASE_URL ?>/loans/<?php echo $loan['id']; ?>/approve" class="btn btn-outline-success" title="Approve">
                                     <i class="fas fa-check"></i>
                                 </a>
                                 <?php endif; ?>
                                 <?php if ($loan['status'] === 'Active' || $loan['status'] === 'Completed'): ?>
-                                <a href="/loans/<?php echo $loan['id']; ?>/installments" class="btn btn-outline-info" title="Installments">
+                                <a href="<?= BASE_URL ?>/loans/<?php echo $loan['id']; ?>/installments" class="btn btn-outline-info" title="Installments">
                                     <i class="fas fa-list"></i>
                                 </a>
                                 <?php endif; ?>

@@ -12,10 +12,10 @@
         <p class="text-muted mb-0">Record and manage member savings</p>
     </div>
     <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/savings/export?<?php echo http_build_query($filters); ?>'">
+        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='<?= BASE_URL ?>/savings/export?<?php echo http_build_query($filters); ?>'">
             <i class="fas fa-file-export me-1"></i> Export
         </button>
-        <a href="/savings/create" class="btn btn-primary btn-sm">
+        <a href="<?= BASE_URL ?>/savings/create" class="btn btn-primary btn-sm">
             <i class="fas fa-plus-circle me-1"></i> Record Savings
         </a>
     </div>
@@ -80,7 +80,7 @@
 <!-- Filters -->
 <div class="card dashboard-card mb-4">
     <div class="card-body">
-        <form method="GET" action="/savings" id="filterForm" class="row g-3">
+        <form method="GET" action="<?= BASE_URL ?>/savings" id="filterForm" class="row g-3">
             <div class="col-md-3">
                 <select class="form-select" name="member_id">
                     <option value="">All Members</option>
@@ -144,7 +144,7 @@
                         <td colspan="8" class="text-center py-4">
                             <i class="fas fa-piggy-bank fa-2x text-muted mb-2 d-block"></i>
                             <p class="text-muted mb-0">No savings transactions found.</p>
-                            <a href="/savings/create" class="btn btn-primary btn-sm mt-2">
+                            <a href="<?= BASE_URL ?>/savings/create" class="btn btn-primary btn-sm mt-2">
                                 <i class="fas fa-plus-circle me-1"></i> Record First Savings
                             </a>
                         </td>
@@ -181,16 +181,16 @@
                         <td><?php echo number_format($transaction['balance_after'], 2); ?></td>
                         <td><?php echo htmlspecialchars($transaction['transaction_mode']); ?></td>
                         <td>
-                            <a href="/savings/receipt/<?php echo $transaction['id']; ?>" target="_blank" class="text-primary">
+                            <a href="<?= BASE_URL ?>/savings/receipt/<?php echo $transaction['id']; ?>" target="_blank" class="text-primary">
                                 <i class="fas fa-print"></i> <?php echo htmlspecialchars($transaction['receipt_no']); ?>
                             </a>
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="/savings/<?php echo $transaction['id']; ?>" class="btn btn-outline-primary" title="View">
+                                <a href="<?= BASE_URL ?>/savings/<?php echo $transaction['id']; ?>" class="btn btn-outline-primary" title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="/savings/<?php echo $transaction['id']; ?>/edit" class="btn btn-outline-warning" title="Edit">
+                                <a href="<?= BASE_URL ?>/savings/<?php echo $transaction['id']; ?>/edit" class="btn btn-outline-warning" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button class="btn btn-outline-danger" onclick="deleteTransaction(<?php echo $transaction['id']; ?>)" title="Delete">
@@ -295,7 +295,7 @@ let deleteId = null;
 
 function deleteTransaction(id) {
     deleteId = id;
-    document.getElementById('deleteForm').action = '/savings/' + id;
+    document.getElementById('deleteForm').action = '<?= BASE_URL ?>/savings/' + id;
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
 

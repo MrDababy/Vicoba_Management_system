@@ -364,19 +364,19 @@
             </div>
             <div class="card-body">
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="/members/create" class="btn btn-primary">
+                    <a href="<?= BASE_URL ?>/members/create" class="btn btn-primary">
                         <i class="fas fa-user-plus me-1"></i> Add Member
                     </a>
-                    <a href="/savings/create" class="btn btn-success">
+                    <a href="<?= BASE_URL ?>/savings/create" class="btn btn-success">
                         <i class="fas fa-plus-circle me-1"></i> Record Savings
                     </a>
-                    <a href="/loans/create" class="btn btn-warning">
+                    <a href="<?= BASE_URL ?>/loans/create" class="btn btn-warning">
                         <i class="fas fa-hand-holding-usd me-1"></i> Apply Loan
                     </a>
-                    <a href="/loans/pending" class="btn btn-info">
+                    <a href="<?= BASE_URL ?>/loans/pending" class="btn btn-info">
                         <i class="fas fa-check-double me-1"></i> Approve Loans
                     </a>
-                    <a href="/reports" class="btn btn-secondary">
+                    <a href="<?= BASE_URL ?>/reports" class="btn btn-secondary">
                         <i class="fas fa-file-alt me-1"></i> Generate Report
                     </a>
                 </div>
