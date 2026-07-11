@@ -129,40 +129,31 @@ class Member extends BaseModel
      */
     public function create(array $data)
     {
-        // Generate member number if not provided
-        if (!isset($data['member_no']) || empty($data['member_no'])) {
+        // Generate member number
+        if (empty($data['member_no'])) {
             $data['member_no'] = $this->generateMemberNumber();
         }
-        
-        // Set default status
-        if (!isset($data['status'])) {
-            $data['status'] = 'Active';
-        }
-        
-        // Validate unique fields
+
+        // Default status
+        $data['status'] ??= 'Active';
+
+        // Check duplicate member number
         if ($this->memberNumberExists($data['member_no'])) {
             throw new \Exception('Member number already exists.');
         }
-        
+
+        // Check duplicate email
         if ($this->emailExists($data['email'])) {
-            throw new \Exception('Email already registered to another member.');
+            throw new \Exception('Email already registered.');
         }
-        
+
+        // Check duplicate National ID
         if ($this->nationalIdExists($data['national_id'])) {
-            throw new \Exception('National ID already registered to another member.');
+            throw new \Exception('National ID already registered.');
         }
-        
-        // Validate and encrypt data
-        $validatedData = $this->validate($data);
-        $encryptedData = $this->encryptData($validatedData);
-        
-        // Handle profile picture upload
-        if (isset($data['profile_pic']) && !empty($data['profile_pic'])) {
-            $encryptedData['profile_pic'] = $data['profile_pic'];
-        }
-        
-        // Create the member
-        return parent::create($encryptedData);
+
+        // Let BaseModel do validation, casting, encryption and insert
+        return parent::create($data);
     }
 
     /**

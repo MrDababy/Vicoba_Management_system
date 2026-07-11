@@ -104,35 +104,35 @@ abstract class BaseModel
      */
     public function create(array $data)
     {
-        // Validate data
-        $validatedData = $this->validate($data);
-        
-        // Apply casts
-        $validatedData = $this->castData($validatedData);
-        
+        // Validate
+        $data = $this->validate($data);
+
+        // Cast data
+        $data = $this->castData($data);
+
         // Encrypt sensitive fields
-        $validatedData = $this->encryptData($validatedData);
-        
+        $data = $this->encryptData($data);
+
         // Build insert query
-        $fields = array_keys($validatedData);
+        $fields = array_keys($data);
         $placeholders = array_fill(0, count($fields), '?');
-        
+
         $sql = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->table,
             implode(', ', $fields),
             implode(', ', $placeholders)
         );
-        
-        // Execute query
-        $stmt = $this->db->query($sql, array_values($validatedData));
-        
+
+        $stmt = $this->db->query($sql, array_values($data));
+
         if ($stmt) {
-            $this->data = $validatedData;
+            $this->data = $data;
             $this->exists = true;
+
             return $this->db->lastInsertId();
         }
-        
+
         return false;
     }
 
