@@ -57,8 +57,7 @@ class Session
         session_start();
         $this->started = true;
 
-        // Regenerate session ID for security
-        $this->regenerate();
+        
     }
 
     /**
@@ -191,13 +190,34 @@ class Session
      * @return void
      */
     public function destroy(): void
-    {
-        if ($this->started) {
-            $_SESSION = [];
-            session_destroy();
-            $this->started = false;
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+
+        // Clear all session data
+        $_SESSION = [];
+
+        // Delete the session cookie
+        if (ini_get('session.use_cookies')) {
+
+            $params = session_get_cookie_params();
+
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
         }
+
+        // Destroy the session
+        session_destroy();
+
+        $this->started = false;
     }
+}
 
     /**
      * Set session timeout

@@ -231,8 +231,7 @@ class AuthController extends BaseController
         // Perform logout
         $this->auth->logout();
         
-        // Clear session
-        $this->session->destroy();
+        
         
         // Set success message
         $this->session->flash('success', 'You have been logged out successfully.');
