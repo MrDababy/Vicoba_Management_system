@@ -97,8 +97,8 @@ $router->get('/members/create', [MemberController::class, 'create']);
 $router->post('/members', [MemberController::class, 'store']);
 $router->get('/members/{id}', [MemberController::class, 'view']);
 $router->get('/members/{id}/edit', [MemberController::class, 'edit']);
-$router->put('/members/{id}', [MemberController::class, 'update']);
-$router->delete('/members/{id}', [MemberController::class, 'delete']);
+$router->post('/members/{id}', [MemberController::class, 'update']);
+$router->post('/members/{id}/delete', [MemberController::class, 'delete']);
 $router->post('/members/{id}/deactivate', [MemberController::class, 'deactivate']);
 $router->get('/members/export', [MemberController::class, 'export']);
 

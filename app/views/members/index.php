@@ -259,7 +259,7 @@
                 <p class="text-danger small">This action cannot be undone. All associated records will be affected.</p>
                 <form id="deleteForm" method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                    <input type="hidden" name="_method" value="DELETE">
+                    <
                 </form>
             </div>
             <div class="modal-footer">
@@ -284,7 +284,7 @@ let deleteId = null;
 function deleteMember(id, name) {
     deleteId = id;
     document.getElementById('deleteMemberName').textContent = name;
-    document.getElementById('deleteForm').action = '<?= BASE_URL ?>/members/' + id;
+    document.getElementById('deleteForm').action = '<?= BASE_URL ?>/members/' + id + '/delete';
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
 

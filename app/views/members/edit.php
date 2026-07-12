@@ -12,10 +12,10 @@
         <p class="text-muted mb-0">Update member information</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="/members/<?php echo $member['id']; ?>" class="btn btn-info btn-sm">
+        <a href="<?= BASE_URL ?>/members/<?php echo $member['id']; ?>" class="btn btn-info btn-sm">
             <i class="fas fa-eye me-1"></i> View
         </a>
-        <a href="/members" class="btn btn-secondary btn-sm">
+        <a href="<?= BASE_URL ?>/members" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left me-1"></i> Back
         </a>
     </div>

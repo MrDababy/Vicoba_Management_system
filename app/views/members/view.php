@@ -12,11 +12,11 @@
         <p class="text-muted mb-0">View complete member information</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="/members" class="btn btn-secondary btn-sm">
+        <a href="<?= BASE_URL ?>/members" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left me-1"></i> Back
         </a>
         <?php if ($can_edit): ?>
-        <a href="/members/<?php echo $member['id']; ?>/edit" class="btn btn-warning btn-sm">
+        <a href="<?= BASE_URL ?>/members/<?php echo $member['id']; ?>/edit" class="btn btn-warning btn-sm">
             <i class="fas fa-edit me-1"></i> Edit
         </a>
         <?php endif; ?>
@@ -347,7 +347,7 @@ let deleteId = null;
 function deleteMember(id, name) {
     deleteId = id;
     document.getElementById('deleteMemberName').textContent = name;
-    document.getElementById('deleteForm').action = '/members/' + id;
+    document.getElementById('deleteForm').action = '<?= BASE_URL ?>/members/' + id;
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
 

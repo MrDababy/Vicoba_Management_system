@@ -269,18 +269,39 @@ class Member extends BaseModel
      * @return bool
      */
     private function hasRelatedRecords(int $id): bool
-    {
-        $tables = ['savings', 'loans', 'repayments', 'fines', 'dividends', 'attendances'];
-        
-        foreach ($tables as $table) {
-            $sql = "SELECT COUNT(*) as count FROM {$table} WHERE member_id = ?";
+{
+        $queries = [
+
+            // Savings
+            "SELECT COUNT(*) FROM savings WHERE member_id = ?",
+
+            // Loans
+            "SELECT COUNT(*) FROM loans WHERE member_id = ?",
+
+            // Repayments (through loans)
+            "SELECT COUNT(*)
+            FROM repayments r
+            INNER JOIN loans l ON r.loan_id = l.id
+            WHERE l.member_id = ?",
+
+            // Fines
+            "SELECT COUNT(*) FROM fines WHERE member_id = ?",
+
+            // Dividends
+            "SELECT COUNT(*) FROM dividends WHERE member_id = ?",
+
+            // Attendances
+            "SELECT COUNT(*) FROM attendances WHERE member_id = ?"
+        ];
+
+        foreach ($queries as $sql) {
             $stmt = $this->db->query($sql, [$id]);
-            $result = $stmt->fetch();
-            if (($result['count'] ?? 0) > 0) {
+
+            if ($stmt->fetchColumn() > 0) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -533,6 +554,86 @@ class Member extends BaseModel
      * @param int $limit Number of members
      * @return array
      */
+
+    public function getMemberStats(int $id): array
+    {
+        $stats = [];
+        
+        // Get savings total
+        $sql = "SELECT 
+                    SUM(CASE WHEN transaction_type = 'Deposit' THEN amount ELSE 0 END) as total_deposits,
+                    SUM(CASE WHEN transaction_type = 'Withdrawal' THEN amount ELSE 0 END) as total_withdrawals
+                FROM savings 
+                WHERE member_id = ?";
+        $stmt = $this->db->query($sql, [$id]);
+        $savings = $stmt->fetch();
+        $stats['savings'] = [
+            'total_deposits' => (float)($savings['total_deposits'] ?? 0),
+            'total_withdrawals' => (float)($savings['total_withdrawals'] ?? 0),
+            'balance' => (float)($savings['total_deposits'] ?? 0) - (float)($savings['total_withdrawals'] ?? 0)
+        ];
+        
+        // Get loans count
+        $sql = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Active' THEN 1 ELSE 0 END) as active,
+                    SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM loans 
+                WHERE member_id = ?";
+        $stmt = $this->db->query($sql, [$id]);
+        $loans = $stmt->fetch();
+        $stats['loans'] = [
+            'total' => (int)($loans['total'] ?? 0),
+            'active' => (int)($loans['active'] ?? 0),
+            'pending' => (int)($loans['pending'] ?? 0),
+            'completed' => (int)($loans['completed'] ?? 0)
+        ];
+        
+        // Get total loan amount
+        $sql = "SELECT SUM(amount) as total_amount FROM loans WHERE member_id = ? AND status NOT IN ('Rejected', 'Defaulted')";
+        $stmt = $this->db->query($sql, [$id]);
+        $amount = $stmt->fetch();
+        $stats['loans']['total_amount'] = (float)($amount['total_amount'] ?? 0);
+        
+        // Get fines
+        $sql = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Pending' OR status = 'Partially_Paid' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = 'Paid' THEN 1 ELSE 0 END) as paid
+                FROM fines 
+                WHERE member_id = ?";
+        $stmt = $this->db->query($sql, [$id]);
+        $fines = $stmt->fetch();
+        $stats['fines'] = [
+            'total' => (int)($fines['total'] ?? 0),
+            'pending' => (int)($fines['pending'] ?? 0),
+            'paid' => (int)($fines['paid'] ?? 0)
+        ];
+        
+        // Get fine amount
+        $sql = "SELECT SUM(amount) as total_amount FROM fines WHERE member_id = ? AND status IN ('Pending', 'Partially_Paid')";
+        $stmt = $this->db->query($sql, [$id]);
+        $fineAmount = $stmt->fetch();
+        $stats['fines']['pending_amount'] = (float)($fineAmount['total_amount'] ?? 0);
+        
+        // Get dividends
+        $sql = "SELECT 
+                    COUNT(*) as total,
+                    SUM(interest_earned) as total_earned,
+                    SUM(CASE WHEN status = 'Paid' THEN interest_earned ELSE 0 END) as paid_earned
+                FROM dividends 
+                WHERE member_id = ?";
+        $stmt = $this->db->query($sql, [$id]);
+        $dividends = $stmt->fetch();
+        $stats['dividends'] = [
+            'total' => (int)($dividends['total'] ?? 0),
+            'total_earned' => (float)($dividends['total_earned'] ?? 0),
+            'paid_earned' => (float)($dividends['paid_earned'] ?? 0)
+        ];
+        
+        return $stats;
+    }
     public function getMembersWithSavings(int $limit = 10): array
     {
         $sql = "SELECT 
