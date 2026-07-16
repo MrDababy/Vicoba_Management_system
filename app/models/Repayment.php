@@ -699,8 +699,8 @@ class Repayment extends BaseModel
      * @return array
      */
    public function getRecentRepayments(int $limit = 5): array
-    {
-        $sql = "SELECT
+{
+    $sql = "SELECT
                 r.*,
                 l.loan_no,
                 m.member_no,
@@ -713,23 +713,21 @@ class Repayment extends BaseModel
             ORDER BY r.payment_date DESC
             LIMIT ?";
 
-        return $this->db->fetchAll($sql, [$limit]);
-    }
-        $stmt = $this->db->query($sql, [$limit]);
-        $data = $stmt->fetchAll();
-        
-        $encryptor = new Encryption();
-        foreach ($data as &$row) {
-            try {
-                $row['member_name'] = $encryptor->decrypt($row['member_name']);
-            } catch (\Exception $e) {
-                // Leave as is
-            }
+    $stmt = $this->db->query($sql, [$limit]);
+    $data = $stmt->fetchAll();
+
+    $encryptor = new Encryption();
+
+    foreach ($data as &$row) {
+        try {
+            $row['member_name'] = $encryptor->decrypt($row['member_name']);
+        } catch (\Exception $e) {
+            // Keep original value if decryption fails
         }
-        
-        return $data;
     }
 
+    return $data;
+}
     /**
      * Get repayment report data
      * 
