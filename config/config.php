@@ -13,9 +13,9 @@
 // Application Settings
 define('APP_NAME', 'VICOBA Management System');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://100.59.187.91/Vikoba_Management_System');
+define('APP_URL', 'http://100.59.187.91');
 define('APP_ENV', 'development'); // development | production | testing
-define('BASE_URL', '/Vikoba_Management_System/public');
+define('BASE_URL', '');
 
 // Timezone Settings
 date_default_timezone_set('Africa/Dar_es_Salaam');
