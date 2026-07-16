@@ -52,15 +52,17 @@ class Router
     public function __construct()
     {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
         $this->uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-        
-        // Remove base path if any
-        $basePath = dirname($_SERVER['SCRIPT_NAME']);
-        if ($basePath !== '/' && strpos($this->uri, $basePath) === 0) {
+
+    // Remove application base path
+        $basePath = '/Vicoba_Management_system/public';
+
+        if (strpos($this->uri, $basePath) === 0) {
             $this->uri = substr($this->uri, strlen($basePath));
         }
-        
-        // Remove trailing slash except for root
+
+        // Remove trailing slash except root
         if ($this->uri !== '/') {
             $this->uri = rtrim($this->uri, '/');
         }
