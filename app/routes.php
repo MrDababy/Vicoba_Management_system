@@ -17,6 +17,7 @@ use App\Controllers\LoanController;
 use App\Controllers\FineController;
 use App\Controllers\DividendController;
 use App\Controllers\ReportController;
+use App\Controllers\RepaymentController;
 
 // Get router instance
 $router = $GLOBALS['router'] ?? null;
@@ -187,3 +188,12 @@ $router->get('/reports/financial', [ReportController::class, 'financial']);
 $router->get('/reports/financial/{format}', [ReportController::class, 'financial']);
 $router->get('/reports/cashflow', [ReportController::class, 'cashflow']);
 $router->get('/reports/cashflow/{format}', [ReportController::class, 'cashflow']);
+
+
+
+$router->get('/repayments', [RepaymentController::class, 'index']);
+$router->get('/repayments/create', [RepaymentController::class, 'create']);
+$router->post('/repayments', [RepaymentController::class, 'store']);
+$router->get('/repayments/{id}', [RepaymentController::class, 'view']);
+$router->get('/repayments/{id}/edit', [RepaymentController::class, 'edit']);
+$router->post('/repayments/{id}', [RepaymentController::class, 'update']);
