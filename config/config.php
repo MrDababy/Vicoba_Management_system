@@ -61,11 +61,13 @@ define('DISPLAY_DEBUG_INFO', true);
 
 // Cache Settings
 define('CACHE_ENABLED', false);
-define('CACHE_LIFETIME', 3600); // 1 hour
+define('CACHE_LIFETIME', 3600); // 1 hou
 
 // Internationalization
 define('DEFAULT_LANGUAGE', 'en');
-define('CURRENCY_SYMBOL', 'TSh');
+if (!defined('CURRENCY_SYMBOL')) {
+    define('CURRENCY_SYMBOL', 'TZS');
+}
 define('CURRENCY_CODE', 'TZS');
 define('DATE_FORMAT', 'Y-m-d');
 define('DATETIME_FORMAT', 'Y-m-d H:i:s');
