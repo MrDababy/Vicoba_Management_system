@@ -698,18 +698,23 @@ class Repayment extends BaseModel
      * @param int $limit Number of repayments
      * @return array
      */
-    public function getRecentRepayments(int $limit = 5): array
+   public function getRecentRepayments(int $limit = 5): array
     {
-        $sql = "SELECT r.*, 
-                       m.member_no, 
-                       m.full_name as member_name,
-                       l.loan_no
-                FROM {$this->table} r 
-                JOIN members m ON r.member_id = m.id 
-                JOIN loans l ON r.loan_id = l.id 
-                ORDER BY r.payment_date DESC 
-                LIMIT ?";
-        
+        $sql = "SELECT
+                r.*,
+                l.loan_no,
+                m.member_no,
+                m.full_name AS member_name
+            FROM {$this->table} r
+            JOIN loans l
+                ON r.loan_id = l.id
+            JOIN members m
+                ON l.member_id = m.id
+            ORDER BY r.payment_date DESC
+            LIMIT ?";
+
+        return $this->db->fetchAll($sql, [$limit]);
+    }
         $stmt = $this->db->query($sql, [$limit]);
         $data = $stmt->fetchAll();
         
