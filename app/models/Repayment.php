@@ -698,7 +698,8 @@ class Repayment extends BaseModel
      * @param int $limit Number of repayments
      * @return array
      */
-   public function getRecentRepayments(int $limit = 5): array
+
+    public function getRecentRepayments(int $limit = 5): array
 {
     $sql = "SELECT
                 r.*,
@@ -722,12 +723,13 @@ class Repayment extends BaseModel
         try {
             $row['member_name'] = $encryptor->decrypt($row['member_name']);
         } catch (\Exception $e) {
-            // Keep original value if decryption fails
+            // Keep original
         }
     }
 
     return $data;
 }
+
     /**
      * Get repayment report data
      * 
