@@ -83,7 +83,8 @@ class User extends BaseModel
      * @throws \Exception
      */
     public function register(array $data)
-    {
+    {   
+        
         // Validate data
         $validated = $this->validate($data);
         

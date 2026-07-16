@@ -1,6 +1,6 @@
 <h4 class="text-center mb-4">Create Account</h4>
 
-<form action="/register" method="POST" id="registerForm">
+<form action="<?= BASE_URL ?>/register" method="POST" id="registerForm">
     <!-- CSRF Token -->
     <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
     
@@ -100,7 +100,7 @@
     
     <!-- Login Link -->
     <div class="text-center mt-4">
-        <p class="mb-0">Already have an account? <a href="/login" class="auth-link">Login Here</a></p>
+        <p class="mb-0">Already have an account? <a href="<?= BASE_URL ?>/login" class="auth-link">Login Here</a></p>
     </div>
 </form>
 

@@ -76,7 +76,7 @@ class Validation
             $rules = explode('|', $rules);
         }
         
-        $value = $this->values[$field] ?? null;
+        $value = $this->values[$field] ?? '';
         
         foreach ($rules as $rule) {
             $this->applyRule($field, $value, $rule);
@@ -197,27 +197,30 @@ class Validation
      */
     private function validateMin($value, array $parameters): bool
     {
+    // If value is empty, let the required rule handle it
+        if ($value === null || $value === '') {
+            return false;
+        }
+
         $min = (int)($parameters[0] ?? 0);
-        return strlen($value) >= $min;
+
+        return strlen((string)$value) >= $min;
     }
 
-    /**
-     * Max length rule
-     */
+/**
+ * Max length rule
+ */
     private function validateMax($value, array $parameters): bool
     {
+        // If value is empty, let the required rule handle it
+        if ($value === null || $value === '') {
+            return true;
+        }
+
         $max = (int)($parameters[0] ?? PHP_INT_MAX);
-        return strlen($value) <= $max;
-    }
 
-    /**
-     * Number rule
-     */
-    private function validateNumber($value, array $parameters): bool
-    {
-        return is_numeric($value);
+        return strlen((string)$value) <= $max;
     }
-
     /**
      * Integer rule
      */

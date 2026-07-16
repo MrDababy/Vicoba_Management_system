@@ -234,6 +234,7 @@ class MemberController extends BaseController
     public function edit(int $id): void
     {
         // Check permissions
+        
         if (!$this->auth->hasRole(['Admin', 'Treasurer', 'Secretary'])) {
             $this->session->flash('error', 'You do not have permission to edit members.');
             $this->redirect('/members');
@@ -314,22 +315,11 @@ class MemberController extends BaseController
             $beforeData = $currentMember;
             
             // Update member
-            if ($this->memberModel->update($id, $data)) {
-                // Log activity
-                ActivityLogger::log(
-                    'UPDATE',
-                    'members',
-                    $id,
-                    "Member updated: {$data['full_name']}",
-                    $beforeData,
-                    $data
-                );
-                
-                $this->session->flash('success', 'Member updated successfully!');
-                $this->redirect('/members/' . $id);
-            } else {
-                throw new \Exception('Failed to update member. Please try again.');
-            }
+          $result = $this->memberModel->update($id, $data);
+
+            var_dump($result);
+            exit;
+            
             
         } catch (ValidationException $e) {
             $this->session->flash('error', $e->getMessage());

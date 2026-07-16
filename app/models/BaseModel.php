@@ -296,10 +296,7 @@ abstract class BaseModel
         
         $stmt = $this->db->query($sql, $params);
         
-        if ($stmt->rowCount() > 0) {
-            $this->data = $this->find($id);
-            return true;
-        }
+        $this->data = $this->find($id);
         
         return false;
     }
